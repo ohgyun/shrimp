@@ -11,6 +11,10 @@ if (!window.J) window.J = {
     this.initModules();
   },
 
+  /**
+   * Inject module dependency to variables that start with '$'.
+   * e.g. if object has $some variable, module 'some' is assigned to $some.
+   */
   injectDependency: function () {
     var t = this;
     t.eachModule(function (name, obj) {
@@ -45,31 +49,53 @@ if (!window.J) window.J = {
     }
   },
 
+  /**
+   * get module by name
+   */
   get: function (name) {
     return this._modules[name];
   },
 
+  /**
+   * init method of each module is called
+   */
   initModules: function () {
     this.eachModule(function (name, obj) {
-      if (typeof obj.init === "function") {
+      if (typeof obj.init === 'function') {
         obj.init();
       }
     });
   },
 
-  clear: function (name) {
-    delete this._modules[name];
+	/**
+	 * clear module
+	 * @param name name[, name, ...]
+	 */
+  clear: function () {
+    var args = Array.prototype.slice.call(arguments),
+    	modules = this._modules,
+    	i, len = args.length;
+    	
+    for (i = 0; i < len; i++) {
+    	delete modules[args[i]];
+    }
   }
 
 };
+/**
+ * call async init function if script downloaded
+ */
 window.setTimeout(function () {
-  if (window.oAsyncInit && !window.oAsyncInit.hasRun) {
-    window.oAsyncInit.hasRun = true;
-    window.oAsyncInit();
+  if (window.jAsyncInit && !window.jAsyncInit.hasRun) {
+    window.jAsyncInit.hasRun = true;
+    window.jAsyncInit();
   }
 }, 0);
 
 
+/**
+ * Util Module
+ */
 J.module('util', {
   
   /**
@@ -113,7 +139,7 @@ J.module('util', {
   },
 
   guid: function () {
-    return 'g' + (Math.random() * (1 << 30)).toString(32).replace('.', '');
+    return 'j' + (Math.random() * (1 << 30)).toString(32).replace('.', '');
   }
 });
 
@@ -125,48 +151,102 @@ J.module('ps', {
   $util: null,
 
   /**
+   * subscribers map.
+   * e.g. If you subscribe 'some.one.*' and 'some.two',..
    * {
-   *   topic: {
-   *     callbackId: callback,
-   *     ...
+   *   some: {
+   *     one: {
+   *       *: {
+   *         callbackId: callback
+   *       }
+   *     }
    *   },
-   *   ...
+   *   two: {
+   *     callbackId: callback
+   *   }
    * }
    */
   _subscribersMap: {},
 
   /**
-   * @param topic
+   * Subscribe topic.
+   * You can seperate topics by dot(.), and subscribe all topics using asterisk(*).
+   * e.g. 'some.topic.*'
+   *
+   * @param topic string or *
    * @param callback(data)
    * @return subscribed callback id
    */
   subscribe: function (topic, callback) {
-    var map = this._subscribersMap,
-      callbackId = this.$util.guid();
-
-    if (!map[topic]) {
-      map[topic] = {};
-    }
-
-    map[topic][callbackId] = callback;
+  	var callbackId = this.$util.guid();
+  	
+  	this.eachSubscriberMapDepth(topic, function (n, m, map, isLast) {
+  		if (isLast) {
+  		  m[callbackId] = callback;	
+  		}
+  	});
 
     return callbackId;
+  },  
+  
+  /**
+   * Do callback for each subscribers map depth
+   *
+   * @param topic
+   * @param callback(n, m, map, isLast)
+   *           n (string) depth name
+   *           m (object) current map
+   *           map (object) parent map
+   *           isLast (boolean) is last depth
+   */
+  eachSubscriberMapDepth: function (topic, callback) {
+  	var map = this._subscribersMap,
+  	  topics = topic.split('.'),
+  	  len = topics.length,
+  	  n, m;
+  	
+  	for (var i = 0; i < len; i++) {
+  		n = topics[i];
+  		m = map[n] = (map[n] || {});
+  		  		
+  		callback(n, m, map, i + 1 === len);	
+  		
+  		map = m;
+  	}
   },
 
   unsubscribe: function (topic, callbackId) {
-    var subscribers = this._subscribersMap[topic];
-    delete subscribers[callbackId];
+  	this.eachSubscriberMapDepth(topic, function (n, m, map, isLast) {
+  		if (isLast) {
+  		  delete m[callbackId];	
+  		}
+  	});
   },
 
   publish: function (topic, data) {
-    var subscribers = this._subscribersMap[topic];
-    this.$util.eachProperty(subscribers, function (k, v) {
-      v(data);
+    var t = this,
+      runCallback = function (m) {
+    		t.$util.eachProperty(m, function (k, v) {
+    			if (typeof v === 'function') {
+    				v(data);
+    			}
+    		});
+    	};
+    
+    this.eachSubscriberMapDepth(topic, function (n, m, map, isLast) {
+    	runCallback(map['*']);
+    	
+    	if (isLast) {
+    		runCallback(m);
+    	}
     });
-  },
+  },  
 
   clear: function (topic) {
-    delete this._subscribersMap[topic];
+  	this.eachSubscriberMapDepth(topic, function (n, m, map, isLast) {
+  		if (isLast) {
+  		  delete map[n];	
+  		}
+  	});
   }
-
 });

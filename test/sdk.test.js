@@ -1,3 +1,6 @@
+//----------------------------------------------------------------------------
+// Core
+//----------------------------------------------------------------------------
 module('J', {
   setup: function () {
     J.module('a', {
@@ -15,8 +18,7 @@ module('J', {
     J.init();
   },
   teardown: function () {
-    J.clear('a');
-    J.clear('b');
+    J.clear('a', 'b');
   }
 });
 
@@ -29,7 +31,9 @@ test('init called when J inited', function () {
   equals("inited", J.get('b')._test);
 });
 
-
+//----------------------------------------------------------------------------
+// Pub/Sub Module
+//----------------------------------------------------------------------------
 module('J.ps', {
   setup: function () {
     J.module('p', {
@@ -46,64 +50,74 @@ module('J.ps', {
       init: function () {
         var t = this;
         this.$ps.subscribe('p.pub', function () {
-          t._result = "s1";
+          t._received = true;
         });
       }
     });
 
     J.module('s2', {
       $ps: null,
-      $util: null,
 
       _callbackId: null,
 
       init: function () {
-        this._callbackId = this.$ps.subscribe('p.pub', this.$util.bind(this.sub, this));
-      },
-
-      sub: function () {
-        this._result = "s2";
+        var t = this;
+        this._callbackId = this.$ps.subscribe('p.pub', function () {
+          t._received = true;
+        });
       },
 
       unsub: function () {
         this.$ps.unsubscribe('p.pub', this._callbackId);
       }
     });
-
+    
     J.init();
   },
   teardown: function () {
-    J.clear('p');
-    J.clear('s1');
-    J.clear('s2');
+    J.clear('p', 's1', 's2');
   }
 
 });
 
+function received(name) {
+	ok(J.get(name)._received);
+}
+
+function notReceived(name) {
+	ok(!!J.get(name)._received === false);
+}
+
+function resetReceived(name) {
+	J.get(name)._received = false;
+}
+
 test('publish', function () {
   J.get('p').pub();
-  equals('s1', J.get('s1')._result);
-  equals('s2', J.get('s2')._result);
+  received('s1');
+  received('s2');
 });
 
 test('unsubscribe', function () {
   J.get('p').pub();
-  equals('s2', J.get('s2')._result);
+  received('s2');
 
-  J.get('s2')._result = '';
+  resetReceived('s2');
   J.get('s2').unsub();
+  
   J.get('p').pub();
-  equals('', J.get('s2')._result);
+  notReceived('s2');
 });
 
 test('clear topic', function () {
   J.get('p').pub();
-  equals('s2', J.get('s2')._result);
+  received('s2');
 
-  J.get('s2')._result = '';
+  resetReceived('s2')
   J.get('p').$ps.clear('p.pub');
+  
   J.get('p').pub();
-  equals('', J.get('s2')._result);
+  notReceived('s2');
 });
 
 test('no subscribers', function () {
@@ -119,5 +133,110 @@ test('invalid subscribe topic', function () {
 test('invalid unsubscribe topic', function () {
   J.get('ps').unsubscribe('invalid.topic', null);
   ok('no error');
+});
+
+
+//----------------------------------------------------------------------------
+// Pub/Sub Module: Message Depth
+//----------------------------------------------------------------------------
+module('J.ps', {
+  setup: function () {
+    J.module('s1', {
+      $ps: null,
+
+      init: function () {
+        var t = this;
+        this.$ps.subscribe('p.one', function () {
+          t._received = true;
+        });
+      }
+    });
+    
+    J.module('s2', {
+      $ps: null,
+
+      init: function () {
+        var t = this;
+        this.$ps.subscribe('p.one.two', function () {
+          t._received = true;
+        });
+      }
+    });
+    
+    J.module('s3', {
+      $ps: null,
+
+      init: function () {
+        var t = this;
+        this.$ps.subscribe('p.one.*', function () {
+          t._received = true;
+        });
+      }
+    });    
+    
+    J.module('s4', {
+      $ps: null,
+
+      init: function () {
+        var t = this;
+        this.$ps.subscribe('p.*', function () {
+          t._received = true;
+        });
+      }
+    });
+    
+    J.module('s5', {
+      $ps: null,
+
+      init: function () {
+        var t = this;
+        this.$ps.subscribe('*', function () {
+          t._received = true;
+        });
+      }
+    });	
+    
+    J.init();
+  },
+  teardown: function () {
+    J.clear('s1', 's2', 's3', 's4', 's5');
+  }
+
+});
+
+test('subscribe topic', function () {
+	J.get('ps').publish('p');
+	notReceived('s1');
+	notReceived('s2');
+	notReceived('s3');
+	notReceived('s4');
+	received('s5');
+});
+
+test('subscribe one depth topic', function () {
+	J.get('ps').publish('p.one');
+	received('s1');
+	notReceived('s2');
+	notReceived('s3');
+	received('s4');
+	received('s5');
+});
+
+test('subscribe two depth topic', function () {
+	J.get('ps').publish('p.one.two');
+	notReceived('s1');
+	received('s2');
+	received('s3');
+	received('s4');
+	received('s5');
+});
+
+test('* subscribe all topic', function () {
+	J.get('ps').publish('');
+	notReceived('s1');
+	notReceived('s2');
+	notReceived('s3');
+	notReceived('s4');
+	received('s5');
 });
 
