@@ -73,11 +73,11 @@ if (!window.J) window.J = {
    */
   clear: function () {
     var args = Array.prototype.slice.call(arguments),
-    	modules = this._modules,
-    	i, len = args.length;
-    	
+      modules = this._modules,
+      i, len = args.length;
+      
     for (i = 0; i < len; i++) {
-    	delete modules[args[i]];
+      delete modules[args[i]];
     }
   }
 
@@ -184,13 +184,13 @@ J.module('ps', {
    * @return subscribed callback id
    */
   subscribe: function (topic, callback) {
-  	var callbackId = this.$util.guid();
-  	
-  	this.eachSubscriberMapDepth(topic, function (n, m, map, isLast) {
-  		if (isLast) {
-  		  m[callbackId] = callback;	
-  		}
-  	});
+    var callbackId = this.$util.guid();
+    
+    this.eachSubscriberMapDepth(topic, function (n, m, map, isLast) {
+      if (isLast) {
+        m[callbackId] = callback; 
+      }
+    });
 
     return callbackId;
   },  
@@ -206,30 +206,30 @@ J.module('ps', {
    *           isLast (boolean) is last depth
    */
   eachSubscriberMapDepth: function (topic, callback) {
-  	var map = this._subscribersMap,
-  	  topics = topic.split('.'),
-  	  len = topics.length,
-  	  n, m;
-  	
-  	for (var i = 0; i < len; i++) {
-  		n = topics[i];
-  		m = map[n] = (map[n] || {});
-  		  		
-  		callback(n, m, map, i + 1 === len);	
-  		
-  		map = m;
-  	}
+    var map = this._subscribersMap,
+      topics = topic.split('.'),
+      len = topics.length,
+      n, m;
+    
+    for (var i = 0; i < len; i++) {
+      n = topics[i];
+      m = map[n] = (map[n] || {});
+            
+      callback(n, m, map, i + 1 === len); 
+      
+      map = m;
+    }
   },
 
   /**
    * Unsubscribe specific callback
    */
   unsubscribe: function (topic, callbackId) {
-  	this.eachSubscriberMapDepth(topic, function (n, m, map, isLast) {
-  		if (isLast) {
-  		  delete m[callbackId];	
-  		}
-  	});
+    this.eachSubscriberMapDepth(topic, function (n, m, map, isLast) {
+      if (isLast) {
+        delete m[callbackId]; 
+      }
+    });
   },
 
   /**
@@ -240,19 +240,19 @@ J.module('ps', {
   publish: function (topic, data) {
     var t = this,
       runCallback = function (m) {
-    		t.$util.eachProperty(m, function (k, v) {
-    			if (typeof v === 'function') {
-    				v(data);
-    			}
-    		});
-    	};
+        t.$util.eachProperty(m, function (k, v) {
+          if (typeof v === 'function') {
+            v(data);
+          }
+        });
+      };
     
     this.eachSubscriberMapDepth(topic, function (n, m, map, isLast) {
-    	runCallback(map['*']);
-    	
-    	if (isLast) {
-    		runCallback(m);
-    	}
+      runCallback(map['*']);
+      
+      if (isLast) {
+        runCallback(m);
+      }
     });
   },  
 
@@ -260,10 +260,10 @@ J.module('ps', {
    * Remove subscribers of specific topic
    */
   clear: function (topic) {
-  	this.eachSubscriberMapDepth(topic, function (n, m, map, isLast) {
-  		if (isLast) {
-  		  delete map[n];	
-  		}
-  	});
+    this.eachSubscriberMapDepth(topic, function (n, m, map, isLast) {
+      if (isLast) {
+        delete map[n];  
+      }
+    });
   }
 });

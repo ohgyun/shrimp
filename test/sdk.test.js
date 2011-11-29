@@ -81,15 +81,15 @@ module('J.ps', {
 });
 
 function received(name) {
-	ok(J.get(name)._received);
+  ok(J.get(name)._received);
 }
 
 function notReceived(name) {
-	ok(!!J.get(name)._received === false);
+  ok(!!J.get(name)._received === false);
 }
 
 function resetReceived(name) {
-	J.get(name)._received = false;
+  J.get(name)._received = false;
 }
 
 test('publish', function () {
@@ -194,7 +194,7 @@ module('J.ps', {
           t._received = true;
         });
       }
-    });	
+    }); 
     
     J.init();
   },
@@ -205,38 +205,38 @@ module('J.ps', {
 });
 
 test('subscribe topic', function () {
-	J.get('ps').publish('p');
-	notReceived('s1');
-	notReceived('s2');
-	notReceived('s3');
-	notReceived('s4');
-	received('s5');
+  J.get('ps').publish('p');
+  notReceived('s1');
+  notReceived('s2');
+  notReceived('s3');
+  notReceived('s4');
+  received('s5');
 });
 
 test('subscribe one depth topic', function () {
-	J.get('ps').publish('p.one');
-	received('s1');
-	notReceived('s2');
-	notReceived('s3');
-	received('s4');
-	received('s5');
+  J.get('ps').publish('p.one');
+  received('s1');
+  notReceived('s2');
+  notReceived('s3');
+  received('s4');
+  received('s5');
 });
 
 test('subscribe two depth topic', function () {
-	J.get('ps').publish('p.one.two');
-	notReceived('s1');
-	received('s2');
-	received('s3');
-	received('s4');
-	received('s5');
+  J.get('ps').publish('p.one.two');
+  notReceived('s1');
+  received('s2');
+  received('s3');
+  received('s4');
+  received('s5');
 });
 
 test('* subscribe all topic', function () {
-	J.get('ps').publish('');
-	notReceived('s1');
-	notReceived('s2');
-	notReceived('s3');
-	notReceived('s4');
-	received('s5');
+  J.get('ps').publish('');
+  notReceived('s1');
+  notReceived('s2');
+  notReceived('s3');
+  notReceived('s4');
+  received('s5');
 });
 
