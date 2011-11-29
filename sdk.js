@@ -67,10 +67,10 @@ if (!window.J) window.J = {
     });
   },
 
-	/**
-	 * clear module
-	 * @param name name[, name, ...]
-	 */
+  /**
+   * clear module
+   * @param name name[, name, ...]
+   */
   clear: function () {
     var args = Array.prototype.slice.call(arguments),
     	modules = this._modules,
@@ -99,6 +99,7 @@ window.setTimeout(function () {
 J.module('util', {
   
   /**
+   * Do callback for each array
    * @param arr
    * @param callback(i, v)
    */
@@ -111,6 +112,7 @@ J.module('util', {
   },
 
   /**
+   * Do callback for each property
    * @param obj
    * @param callback(k, v)
    */
@@ -125,6 +127,7 @@ J.module('util', {
   },
 
   /**
+   * Bind function to context object
    * @param fn
    * @param context
    * @param data, ...
@@ -138,6 +141,9 @@ J.module('util', {
     };
   },
 
+  /**
+   * Create random unique id
+   */
   guid: function () {
     return 'j' + (Math.random() * (1 << 30)).toString(32).replace('.', '');
   }
@@ -151,7 +157,7 @@ J.module('ps', {
   $util: null,
 
   /**
-   * subscribers map.
+   * Subscribers map.
    * e.g. If you subscribe 'some.one.*' and 'some.two',..
    * {
    *   some: {
@@ -215,6 +221,9 @@ J.module('ps', {
   	}
   },
 
+  /**
+   * Unsubscribe specific callback
+   */
   unsubscribe: function (topic, callbackId) {
   	this.eachSubscriberMapDepth(topic, function (n, m, map, isLast) {
   		if (isLast) {
@@ -223,6 +232,11 @@ J.module('ps', {
   	});
   },
 
+  /**
+   * Publish topic with data
+   * @param topic (string) The topic has seperator dot('.'), and does not recommand include '*'.
+   * @param data (object)
+   */
   publish: function (topic, data) {
     var t = this,
       runCallback = function (m) {
@@ -242,6 +256,9 @@ J.module('ps', {
     });
   },  
 
+  /**
+   * Remove subscribers of specific topic
+   */
   clear: function (topic) {
   	this.eachSubscriberMapDepth(topic, function (n, m, map, isLast) {
   		if (isLast) {
