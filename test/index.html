@@ -3,28 +3,61 @@
 <html>
 <head>
 <link rel="stylesheet" href="http://code.jquery.com/qunit/git/qunit.css" type="text/css" media="screen" />
+<style type="text/css">
+#moduleWrap {margin:5px 0; padding:4px; border:2px solid #333; font-family:"Helvetica"}
+#moduleWrap h2 {margin:2px 0; font-size:1.2em}
+#modules a {padding:2px 6px}
+</style>
 <script type="text/javascript" src="http://code.jquery.com/qunit/git/qunit.js"></script>
-<script type="text/javascript">
-(function () {
-  var search = location.search,
-    moduleName = search.slice(search.indexOf('module=') + 7),
-    moduleJsUrl = '../' + moduleName + '.js',
-    moduleTestUrl = moduleName + '.test.js';
-  
-  if (moduleName && moduleTestUrl) {
-    document.write('<script src="' + moduleJsUrl + '"><' + '/script>');
-    document.write('<script src="' + moduleTestUrl + '"><' + '/script>'); 
-  }
-  
-}());
-</script>
+<script type="text/javascript" src="http://jshamcrest.destaquenet.com/jshamcrest.js"></script>
+<script type="text/javascript" src="http://cloud.github.com/downloads/chrisleishman/jsmockito/jsmockito-1.0.4.js"></script>
+<script type="text/javascript" src="../core.js"></script>
 </head>
-<body>
+<body>  
+<div id="moduleWrap">
+  <h2>Modules</h2>  
+  <div id="modules"></div>
+</div>
+<div id="qunitWrap" style="display:none;">
   <h1 id="qunit-header">QUnit example</h1>
   <h2 id="qunit-banner"></h2>
   <div id="qunit-testrunner-toolbar"></div>
   <h2 id="qunit-userAgent"></h2>
   <ol id="qunit-tests"></ol>
   <div id="qunit-fixture"></div>
+</div>
+
+<script type="text/javascript">
+
+// integrate mock to qunit framework
+JsHamcrest.Integration.QUnit();
+JsMockito.Integration.QUnit();
+  
+(function () {
+  
+  var modules = ['core', 'ps', 'pointcut'],
+    search = location.search,
+    siModuleName = search.indexOf('module=') + 7,
+    eiModuleName = search.indexOf('&') > -1 ? search.indexOf('&') : search.length,
+    moduleName = search.slice(siModuleName, eiModuleName),
+    moduleJsUrl = '../' + moduleName + '.js',
+    moduleTestUrl = moduleName + '.test.js';
+
+  // print modules button
+  var a = [];
+  for (var i = 0; i < modules.length; i++) {
+    a.push('<a href="./index.html?module=' + modules[i] + '">' + modules[i] + '</a>');
+  }
+  document.getElementById('modules').innerHTML = a.join('');
+
+  // print test script
+  if (moduleName && moduleTestUrl) {
+    document.write('<script src="' + moduleJsUrl + '"><' + '/script>');
+    document.write('<script src="' + moduleTestUrl + '"><' + '/script>');
+    document.getElementById('qunitWrap').style.display = "block";
+  }
+  
+}());
+</script>
 </body>
 </html>
