@@ -43,12 +43,6 @@ test('module name match: name should not have blank', function () {
   unmatchName('a', ' a');
 });
 
-test('expression is not valid', function () {
-  raises(function () {
-    o.matchName('?invalid expression');
-  }, o.msg.INVALID_EXPR);
-});
-
 function matchName(expression, name) {
   ok(o.matchName(expression, name)); 
 }
@@ -57,81 +51,58 @@ function unmatchName(expression, name) {
   ok(o.matchName(expression, name) === false); 
 }
 
-test('return type match: wild card', function () {
-  matchType('*', undefined);
-  matchType('*', null);
-  matchType('*', 1);
-  matchType('*', 0);
-  matchType('*', -1);
-  matchType('*', 'str');
-  matchType('*', {});
-  matchType('*', []);
-  matchType('*', function () {});
-});
-
-test('return type match: undefined', function () {
-  matchType('undefined', undefined);
-  unmatchType('undefined', '');
-  unmatchType('undefined', false);
-  unmatchType('undefined', null);
-});
-
-test('return type match: object', function () {
-  matchType('object', {});
-  matchType('object', []);
-  matchType('object', null);
-  unmatchType('object', undefined);
-  unmatchType('object', function () {});
+test('expr validation', function () {
+  ok(o._rExpr.test('module.doSomething()'));
+  ok(o._rExpr.test('m*.do*()'));
+  ok(o._rExpr.test('a*b.*()'));
+  ok(o._rExpr.test('a*bc.*ab*c()'));
+  ok(o._rExpr.test('*.*()'));
+  ok(o._rExpr.test('*()'));
+  ok(o._rExpr.test('do*()'));
+  ok(o._rExpr.test('a*()'));
   
-  matchType('Object', {});
-  matchType('Object', []);
-  unmatchType('Object', null);
+  
+  ok(o._rExpr.test('.*()') === false);
+  ok(o._rExpr.test('*') === false);
+  ok(o._rExpr.test('()') === false);
+  ok(o._rExpr.test('*.*') === false);
+  ok(o._rExpr.test('abc') === false);
 });
 
-test('return type match: function', function () {
-  matchType('function', function () {});
-  matchType('function', new Function());
-  matchType('Function', function () {});
-  matchType('Function', new Function());
-  unmatchType('function', {});
+test('add expr: without module', function () {
+  o.add('a', 'do*()');
+  
+  same({
+    module: '*',
+    method: 'do*' 
+  }, o._exprs['a']);
 });
 
-test('return type match: Array', function () {
-  matchType('Array', []);
-  matchType('Array', new Array());
+test('add expr: with module', function () {
+  o.add('b', 'abc*.do*()');
+  
+  same({
+    module: 'abc*',
+    method: 'do*' 
+  }, o._exprs['b']);
 });
 
-test('return type match: string', function () {
-  matchType('string', 'abc');
-  matchType('string', '');
-  matchType('string', String('a'));
-  matchType('string', new String('a'));
-  matchType('String', 'abc');
-  matchType('String', '');
-  matchType('String', String('a'));
-  matchType('String', new String('a'));
+test('add expr: invalid id', function () {
+  raises(function () {
+    o.add('', 'abc');
+  }, 'if no id');
 });
 
-test('return type match: number', function () {
-  matchType('number', 3);
-  matchType('number', 0);
-  matchType('number', Number(3));
-  matchType('number', new Number(3));
-  matchType('Number', 3);
-  matchType('Number', 0);
-  matchType('Number', Number(3));
-  matchType('Number', new Number(3));
+test('add expr: invalid expression', function () {
+  raises(function () {
+    o.add('a', '?xxx');
+  }, 'if invalid expression');
+  
+  raises(function () {
+    o.add('a', 'abc..');
+  }, 'if no id');
+  
+  raises(function () {
+    o.add('a', 'a b');
+  });
 });
-
-test('return type match: null', function () {
-  matchType('null', null);
-  unmatchType('null', undefined);
-});
-
-function matchType(type, value) {
-  ok(o.matchType(type, value));
-}
-
-function unmatchType(type, value) {
-  ok(o.matchType(type, value) === false);
-}
