@@ -1,7 +1,5 @@
 J.module('pointcut', {
   
-  $core: null,
-  
   /**
    * pointcut expressions
    * {
@@ -50,9 +48,25 @@ J.module('pointcut', {
       method: parsed[2]
     };
   },
+  
+  /**
+   * Test if module & method name matches
+   * @param id (string) pointcut id
+   * @param moduleName (string)
+   * @param methodName (string)
+   */
+  match: function(id, moduleName, methodName) {
+    var expr = this._exprs[id];
+    if (expr
+        && this.matchName(expr.module, moduleName)
+        && this.matchName(expr.method, methodName)) {
+      return true;     
+    }
+    return false;
+  },
 
   /**
-   * Test if module name matches
+   * Test if name matches
    * @param expr (string) expression
    * @param name (string) module name
    * @return (boolean) matched result
@@ -63,7 +77,7 @@ J.module('pointcut', {
     }
     
     // abc* --> /^abc\w+$/
-    var nameExpr = '^' + expr.replace(/\*/g, '\\w+') + '$';
+    var nameExpr = '^' + expr.replace(/\*/g, '\\w*') + '$';
     return new RegExp(nameExpr).test(name);
   }
 });

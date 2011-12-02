@@ -14,25 +14,25 @@ test('module name match: all wild card', function () {
 
 test('module name match: wild card at last', function () {
   matchName('a*', 'abc');
-  unmatchName('a*', 'a');  
+  matchName('a*', 'a');  
 });
 
 test('module name match: wild card at first', function () {
   matchName('*bc', 'abc');
-  unmatchName('*bc', 'bc');
+  matchName('*bc', 'bc');
   unmatchName('*bc', '');
 });
 
 test('module name match: wild card at each side', function () {
   matchName('*bcd*', 'abcde');
   matchName('*bcd*', 'bbcdbcdxx');
-  unmatchName('*bcd*', 'bcd');
+  matchName('*bcd*', 'bcd');
   unmatchName('*bcd*', '');
 });
 
 test('module name match: wild card at center', function () {
   matchName('a*bcd', 'aabcd');
-  unmatchName('a*bcd', 'abcd');
+  matchName('a*bcd', 'abcd');
   unmatchName('a*bcd', 'abbce');  
   unmatchName('a*bcd', '');
 });
@@ -105,4 +105,16 @@ test('add expr: invalid expression', function () {
   raises(function () {
     o.add('a', 'a b');
   });
+});
+
+test('match module', function () {
+  o.add('cacheExpr', 'ajax.request*()');
+  
+  ok(o.match('cacheExpr', 'ajax', 'requestWithCache'));
+  ok(o.match('cacheExpr', 'ajax', 'request'));
+  
+  ok(o.match('cacheExpr', 'ajax1', 'request') === false);
+  ok(o.match('cacheExpr', 'ajax', 're1quest') === false);
+  ok(o.match('cacheExpr', 'ajax', 're1questrequest') === false);
+  ok(o.match('xxxx', 'ajax', 'request') === false);
 });
