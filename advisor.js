@@ -1,4 +1,4 @@
-J.module('advice', {
+J.module('advisor', {
   
   $pointcut: null,
   
@@ -14,7 +14,7 @@ J.module('advice', {
     this.$advice.add(adviceId, advice); 
   },
   
-  addAdvisor(id, pointcutId, adviceId) {
+  addAdvisor: function (id, pointcutId, adviceId) {
     this._advisors[id] = {
       pointcut: pointcutId,
       advice: adviceId
@@ -27,3 +27,21 @@ J.module('advice', {
   
 
 });
+
+
+aop.config({
+  pointcut: {
+    { id: "getterMatch", expr: "getter*()" },
+    { id: "ajaxCache", expr: "ajax.request*()" }
+  },
+  advice: {
+    { id: "upperCase", func: function (method) {} },
+    { id: "cache", func: function (method) {} }
+  },
+  advisor: {
+    { id: "getterUpperCase", pointcut: "getterMatch", advice: "upperCase" }
+  }
+});
+
+
+
