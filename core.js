@@ -109,23 +109,7 @@ if (!window.J) window.J = {
    */
   guid: function () {
     return 'j' + (Math.random() * (1 << 30)).toString(32).replace('.', '');
-  },
-  
-  /**
-   * Bind function to context object
-   * @param fn
-   * @param context
-   * @param data, ...
-   */
-  bind: function (fn, context) {
-    var slice = Array.prototype.slice,
-      args = slice.call(arguments, 2);
-
-    return function () {
-      fn.apply(context, args.concat(slice.call(arguments))); 
-    };
   }
-
 };
 /**
  * call async init function if script downloaded
