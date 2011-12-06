@@ -29,19 +29,5 @@ J.module('advisor', {
 });
 
 
-aop.config({
-  pointcut: {
-    { id: "getterMatch", expr: "getter*()" },
-    { id: "ajaxCache", expr: "ajax.request*()" }
-  },
-  advice: {
-    { id: "upperCase", func: function (method) {} },
-    { id: "cache", func: function (method) {} }
-  },
-  advisor: {
-    { id: "getterUpperCase", pointcut: "getterMatch", advice: "upperCase" }
-  }
-});
-
 
 

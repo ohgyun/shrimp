@@ -40,7 +40,7 @@ module('J.ps', {
     J.init();
   },
   teardown: function () {
-    J.clear('p', 's1', 's2');
+    J.destroy('p', 's1', 's2');
   }
 
 });
@@ -160,7 +160,7 @@ module('J.ps', {
     J.init();
   },
   teardown: function () {
-    J.clear('s1', 's2', 's3', 's4', 's5');
+    J.destroy('s1', 's2', 's3', 's4', 's5');
   }
 
 });

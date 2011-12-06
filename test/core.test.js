@@ -15,7 +15,7 @@ module('J core', {
     J.init();
   },
   teardown: function () {
-    J.clear('a', 'b');
+    J.destroy('a', 'b');
   }
 });
 
@@ -32,7 +32,7 @@ test('test core module', function () {
   equals(J.get('core'), J);
 });
 
-test('clear module', function () {
-  J.clear('b');
+test('destroy module', function () {
+  J.destroy('b');
   equals(J.get('b'), null);
 });

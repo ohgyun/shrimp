@@ -11,10 +11,20 @@ if (!window.J) window.J = {
 
   _modules: {},
  
+  /**
+   * define module
+   * @param name (string) module name. 'name' property of obj is setted by this name.
+   * @param obj (object) object. obj is not function.
+   */
   module: function (name, obj) {
+    obj.name = name;
     this._modules[name] = obj;
   },
 
+  /**
+   * init framework.
+   * inject module dependency and init each module.
+   */
   init: function () {
     this.module('core', this);
     this.injectDependency();
@@ -92,14 +102,18 @@ if (!window.J) window.J = {
   },
 
   /**
-   * clear module
+   * destroy module
    * @param name name[, name, ...]
    */
-  clear: function () {
+  destroy: function () {
     var args = Array.prototype.slice.call(arguments),
       modules = this._modules;
       
     this.each(args, function (i, v) {
+      var module = modules[v];
+      if (module && typeof module.destroy === 'function') {
+        module.destroy(); 
+      }
       delete modules[v];
     });
   },

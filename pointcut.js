@@ -15,7 +15,7 @@ J.module('pointcut', {
    */
   _rExpr: /^(?:([\w\*]+)\.)?([\w\*]+)\(\)$/,
   
-  msg: {
+  MSG: {
     INVALID_EXPR: 'J.pointcut: invalid expression',
     ID_REQUIRED: 'J.pointcut: id required'
   },
@@ -34,13 +34,13 @@ J.module('pointcut', {
    */
   add: function (id, expr) {
     if (!id) {
-      throw this.msg.ID_REQUIRED; 
+      throw this.MSG.ID_REQUIRED; 
     }
     
     var parsed = this._rExpr.exec(expr);
     
     if (!parsed) {
-      throw this.msg.INVALID_EXPR; 
+      throw this.MSG.INVALID_EXPR; 
     }
     
     this._exprs[id] = {
