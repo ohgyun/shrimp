@@ -29,7 +29,7 @@ J.module('ps', {
    * e.g. 'some.topic.*'
    *
    * @param topic string or *
-   * @param callback(data)
+   * @param callback(data, topic)
    * @return subscribed callback id
    */
   subscribe: function (topic, callback) {
@@ -91,7 +91,7 @@ J.module('ps', {
       runCallback = function (m) {
         t.$core.eachProperty(m, function (k, v) {
           if (typeof v === 'function') {
-            v(data);
+            v(data, topic);
           }
         });
       };
