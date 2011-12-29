@@ -9,8 +9,8 @@ J.module('aop', {
   /**
    * set advisor to modules.
    * id will be created randomly.
-   * @param pointcut (string) pointcut expression
-   * @param advice (function) advice
+   * @param {string} pointcut Pointcut expression
+   * @param {function(function, ...*)} advice
    */
   set: function (pointcut, advice) {
     var id = this.$core.guid();  
@@ -20,9 +20,9 @@ J.module('aop', {
   
   /**
    * add advisor with specific id
-   * @param id (string) advisor id. same with pointcut and advice.
-   * @param pointcut (string) pointcut expression
-   * @param advice (function) advice
+   * @param {string} id Advisor id. same with pointcut and advice.
+   * @param {string} pointcut Pointcut expression
+   * @param {function(function, ...*)} advice
    */
   addAdvisor: function (id, pointcut, advice) {
     this.$pointcut.add(id, pointcut);
@@ -31,7 +31,7 @@ J.module('aop', {
   
   /**
    * apply advice to module by with specific advisor id
-   * @param id (string) advisor id
+   * @param {string} id Advisor id
    */
   applyAdvisorToModules: function (id) {
     var t = this;

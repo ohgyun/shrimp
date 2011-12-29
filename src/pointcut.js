@@ -2,16 +2,13 @@ J.module('pointcut', {
   
   /**
    * pointcut expressions
-   * {
-   *   { id(string), expression(string) }, { ... }, ...
-   * }
+   * @type {Object.<string, {module: string, method: string}>}
    */
   _exprs: {},
   
   /**
-   * expression: [moduleName.]methodName()
-   * - group1 : moduleName
-   * - group2 : methodName
+   * @type {RegExp} Expression likes '[moduleName.]methodName()'.
+   *     Group1 is moduleName and group2 is methodName.
    */
   _rExpr: /^(?:([\w\*]+)\.)?([\w\*]+)\(\)$/,
   
@@ -22,15 +19,8 @@ J.module('pointcut', {
   
   /**
    * add pointcut and store to _exprs
-   * {
-   *   id: {
-   *     module: 'module expression',
-   *     method: 'method expression'
-   *   }, ...
-   * }
-   * @param id (string) pointcut id
-   * @param expr (string) expression
-   *      expression: [moduleName.]methodName()
+   * @param {string} id Pointcut id.
+   * @param {string} expr Pointcut expression likes [moduleName.]methodName()
    */
   add: function (id, expr) {
     if (!id) {
@@ -51,9 +41,10 @@ J.module('pointcut', {
   
   /**
    * Test if module & method name matches
-   * @param id (string) pointcut id
-   * @param moduleName (string)
-   * @param methodName (string)
+   * @param {string} id Pointcut id
+   * @param {string} moduleName
+   * @param {string} methodName
+   * @return {boolean}
    */
   match: function(id, moduleName, methodName) {
     var expr = this._exprs[id];
@@ -67,9 +58,9 @@ J.module('pointcut', {
 
   /**
    * Test if name matches
-   * @param expr (string) expression
-   * @param name (string) module name
-   * @return (boolean) matched result
+   * @param {string} expr Name expression
+   * @param {string} name Target name
+   * @return {boolean} Matched result
    */
   matchName: function (expr, name) {
     if (expr === '*') {

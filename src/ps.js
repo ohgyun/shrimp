@@ -7,30 +7,31 @@ J.module('ps', {
 
   /**
    * Subscribers map.
-   * e.g. If you subscribe 'some.one.*' and 'some.two',..
-   * {
-   *   some: {
-   *     one: {
-   *       *: {
-   *         callbackId: callback
+   * @type {Object.<string, Object.<string, function>}
+   * @example If you subscribe 'some.one.*' and 'some.two',..
+   *     {
+   *       some: {
+   *         one: {
+   *           *: {
+   *             callbackId: callback
+   *           }
+   *         },
+   *         two: {
+   *           callbackId: callback
+   *         }
    *       }
    *     }
-   *   },
-   *   two: {
-   *     callbackId: callback
-   *   }
-   * }
    */
   _subscribersMap: {},
 
   /**
    * Subscribe topic.
-   * You can seperate topics by dot(.), and subscribe all topics using asterisk(*).
+   * You can seperate topics by dot(.), and subscribe all topics using wildcard(*).
    * e.g. 'some.topic.*'
    *
-   * @param topic string or *
-   * @param callback(data, topic)
-   * @return subscribed callback id
+   * @param {string} topic Topic
+   * @param {function(?Object, string)} callback(data, topic)
+   * @return {string} Subscribed callback id
    */
   subscribe: function (topic, callback) {
     var callbackId = this.$core.guid();
@@ -47,8 +48,8 @@ J.module('ps', {
   /**
    * Do callback for each subscribers map depth
    *
-   * @param topic
-   * @param callback(n, m, map, isLast)
+   * @param {string} topic
+   * @param {function(string, Object, Object, boolean)} callback(n, m, map, isLast)
    *           n (string) depth name
    *           m (object) current map
    *           map (object) parent map
@@ -72,6 +73,8 @@ J.module('ps', {
 
   /**
    * Unsubscribe specific callback
+   * @param {string} topic
+   * @param {string} callbackId
    */
   unsubscribe: function (topic, callbackId) {
     this.eachSubscriberMapDepth(topic, function (n, m, map, isLast) {
@@ -83,8 +86,8 @@ J.module('ps', {
 
   /**
    * Publish topic with data
-   * @param topic (string) The topic has seperator dot('.'), and does not recommand include '*'.
-   * @param data (object)
+   * @param {string} topic The topic has seperator dot('.'), and does not recommand include '*'.
+   * @param {?Object=} data
    */
   publish: function (topic, data) {
     var t = this,
@@ -107,6 +110,7 @@ J.module('ps', {
 
   /**
    * Remove subscribers of specific topic
+   * @param {string} topic
    */
   clear: function (topic) {
     this.eachSubscriberMapDepth(topic, function (n, m, map, isLast) {

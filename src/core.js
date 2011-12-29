@@ -9,12 +9,15 @@
  */
 if (!window.J) window.J = {
 
+  /**
+   * @type {Object.<string, Object>}
+   */
   _modules: {},
  
   /**
    * define module
-   * @param name (string) module name. 'name' property of obj is setted by this name.
-   * @param obj (object) object. obj is not function.
+   * @param {string} name Module name. 'name' property of obj is setted by this name.
+   * @param {!Object} obj Module object.
    */
   module: function (name, obj) {
     obj.name = name;
@@ -48,7 +51,8 @@ if (!window.J) window.J = {
   },
 
   /**
-   * @param callback(name, obj)
+   * Do callback for each module
+   * @param {function(string, !Object)} callback
    */
   eachModule: function (callback) {
     var ms = this._modules;
@@ -57,8 +61,8 @@ if (!window.J) window.J = {
 
   /**
    * Do callback for each property
-   * @param obj
-   * @param callback(k, v)
+   * @param {!Object} obj
+   * @param {function(string, *)} callback
    */
   eachProperty: function (obj, callback) {
     var k, v;
@@ -72,8 +76,8 @@ if (!window.J) window.J = {
   
   /**
    * Do callback for each array
-   * @param arr
-   * @param callback(i, v)
+   * @param {Array} arr
+   * @param {function(number, *)} callback
    */
   each: function (arr, callback) {
     var i, v, len = arr.length;
@@ -85,6 +89,8 @@ if (!window.J) window.J = {
 
   /**
    * get module by name
+   * @param {string} name Module name.
+   * @return {Object} module
    */
   get: function (name) {
     return this._modules[name];
@@ -103,9 +109,9 @@ if (!window.J) window.J = {
 
   /**
    * destroy module
-   * @param name name[, name, ...]
+   * @param {...string} var_args Module names to destroy.
    */
-  destroy: function () {
+  destroy: function (var_args) {
     var args = Array.prototype.slice.call(arguments),
       modules = this._modules;
       
@@ -120,6 +126,7 @@ if (!window.J) window.J = {
   
   /**
    * Create random unique id
+   * @return {string} Random id.
    */
   guid: function () {
     return 'j' + (Math.random() * (1 << 30)).toString(32).replace('.', '');

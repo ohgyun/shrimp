@@ -1,5 +1,8 @@
 J.module('advice', {
   
+  /**
+   * @type {Object.<string, function>}
+   */
   _advices: {},
   
   msg: {
@@ -8,8 +11,8 @@ J.module('advice', {
   
   /**
    * add advice
-   * @param id (string) advice id
-   * @param advice (function) advice
+   * @param {string} id Advice id
+   * @param {function(function, ...*)} advice Advice.
    *          function (method[, param, ...])
    *              method (function) original method binded by original object.
    *              param (mixed) original method parameters
@@ -25,9 +28,9 @@ J.module('advice', {
   
   /**
    * Set advice to method in object
-   * @param id (string) advice id
-   * @param obj (object) target object
-   * @param methodName (string) target methodName which is applied to advice
+   * @param {string} id Advice id
+   * @param {!Object} obj Target object
+   * @param {string} methodName Method name applied to advice
    */
   set: function (id, obj, methodName) {
     var advice = this._advices[id],
@@ -42,11 +45,11 @@ J.module('advice', {
   
   /**
    * Bind function to context object
-   * @param fn
-   * @param context
-   * @param data, ...
+   * @param {function()} fn
+   * @param {!Object} context Context to bind
+   * @param {...*} var_args Parameters
    */
-  bind: function (fn, context) {
+  bind: function (fn, context, var_args) {
     var slice = Array.prototype.slice,
       args = slice.call(arguments, 2);
 
