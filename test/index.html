@@ -11,7 +11,7 @@
 <script type="text/javascript" src="http://code.jquery.com/qunit/git/qunit.js"></script>
 <script type="text/javascript" src="http://jshamcrest.destaquenet.com/jshamcrest.js"></script>
 <script type="text/javascript" src="http://cloud.github.com/downloads/chrisleishman/jsmockito/jsmockito-1.0.4.js"></script>
-<script type="text/javascript" src="../core.js"></script>
+<script type="text/javascript" src="../src/core.js"></script>
 </head>
 <body>  
 <div id="moduleWrap">
@@ -40,7 +40,7 @@ JsMockito.Integration.QUnit();
     siModuleName = search.indexOf('module=') + 7,
     eiModuleName = search.indexOf('&') > -1 ? search.indexOf('&') : search.length,
     moduleName = search.slice(siModuleName, eiModuleName),
-    moduleJsUrl = '../' + moduleName + '.js',
+    moduleJsUrl = '../src/' + moduleName + '.js',
     moduleTestUrl = moduleName + '.test.js';
 
   // print modules button
