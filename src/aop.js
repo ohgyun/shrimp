@@ -1,4 +1,7 @@
-J.module('aop', {
+/**
+ * AOP Library
+ */
+J.library('aop', {
   
   $core: null,
   

@@ -1,21 +1,18 @@
-module('J.advice', {
-  setup: function () {  
-    window.o = J.get('advice');
-    J.init();
-  },
-  teardown: function () {
-  }
-});
+module('J.advice');
+
+function adv() {
+  return J._libraries['advice']; 
+}
 
 test('add advice', function () {
   var advice = function () {};
-  o.add('a', advice);
-  equals(advice, o._advices['a']);
+  adv().add('a', advice);
+  equals(advice, adv()._advices['a']);
 });
 
 test('add advice: wrong param', function () {
   raises(function () {
-    o.add('b', 'not function');
+    adv().add('b', 'not function');
   }, 'advice should be function');
 });
 
@@ -25,7 +22,7 @@ test('apply advice', function () {
   
   addUpperCaseAdvice();
   
-  o.set('upperCase', mock, 'getName');
+  adv().set('upperCase', mock, 'getName');
   
   equals('MOCK', mock.getName());
 });
@@ -43,7 +40,7 @@ function getMock() {
 }
 
 function addUpperCaseAdvice() {
-  o.add('upperCase', function (method) {
+  adv().add('upperCase', function (method) {
     var ret = method();
     return ret.toUpperCase();
   }); 
@@ -56,14 +53,14 @@ test('apply advice: function with param ', function () {
     
   addMakeParamToUpperCaseAdvice();
   
-  o.set('paramUpperCase', mock, 'setName');
+  adv().set('paramUpperCase', mock, 'setName');
 
   mock.setName('newMock');
   equals('NEWMOCK', mock.getName());
 });
 
 function addMakeParamToUpperCaseAdvice() {
-  o.add('paramUpperCase', function (method, name) {
+  adv().add('paramUpperCase', function (method, name) {
     method(name.toUpperCase());
   }); 
 }

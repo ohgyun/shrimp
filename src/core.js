@@ -37,8 +37,26 @@ if ( ! window.J) window.J = {
    */
   module: function (name, obj) {
     obj.name = name;
-    this.injectLibraryDependency(obj);
     this._modules[name] = obj;
+  },
+  
+  /**
+   * Initialize framework.
+   * Inject library dependencies.
+   * @public
+   */
+  init: function () {
+    var t = this;
+    
+    this._libraries['core'] = this;
+    
+    this.eachLibrary(function (name, obj) {
+      t.injectLibraryDependency(obj);
+    });
+    
+    this.eachModule(function (name, obj) {
+      t.injectLibraryDependency(obj);
+    });
   },
 
   /**
@@ -56,12 +74,21 @@ if ( ! window.J) window.J = {
   },
 
   /**
+   * Do callback for each library
+   * @param {function(string, !Object)} callback
+   */
+  eachLibrary: function (callback) {
+    var libs = this._libraries;
+    this.eachProperty(libs, callback);
+  },
+
+  /**
    * Do callback for each module
    * @param {function(string, !Object)} callback
    */
   eachModule: function (callback) {
-    var ms = this._modules;
-    this.eachProperty(ms, callback);
+    var mods = this._modules;
+    this.eachProperty(mods, callback);
   },
 
   /**
@@ -78,22 +105,10 @@ if ( ! window.J) window.J = {
       }
     }
   },
-  
-  /**
-   * Do callback for each array
-   * @param {Array} arr
-   * @param {function(number, *)} callback
-   */
-  each: function (arr, callback) {
-    var i, v, len = arr.length;
-    for (i = 0; i < len; i++) {
-      v = arr[i];
-      callback.call(arr, i, v);
-    }
-  },  
 
   /**
    * Start all modules.
+   * @public
    */
   startAll: function () {
     this.eachModule(function (name, obj) {
@@ -106,6 +121,7 @@ if ( ! window.J) window.J = {
   /**
    * Start module
    * @param {string} moduleName
+   * @public
    */
   start: function (moduleName) {
     var module = this._modules[moduleName];
@@ -116,6 +132,7 @@ if ( ! window.J) window.J = {
 
   /**
    * Stop all modules
+   * @public
    */
   stopAll: function () {
     this.eachModule(function (name, obj) {
@@ -128,29 +145,12 @@ if ( ! window.J) window.J = {
   /**
    * Stop module
    * @param {string} moduleName
+   * @public
    */
   stop: function (moduleName) {
     var module = this._modules[moduleName];
     if (typeof module.destroy === 'function') {
       module.destroy();
     }
-
-  },
-  
-  /**
-   * Create random unique id
-   * @return {string} Random id.
-   */
-  guid: function () {
-    return 'j' + (Math.random() * (1 << 30)).toString(32).replace('.', '');
   }
 };
-/**
- * call async init function if script downloaded
- */
-window.setTimeout(function () {
-  if (window.jAsyncInit && !window.jAsyncInit.hasRun) {
-    window.jAsyncInit.hasRun = true;
-    window.jAsyncInit();
-  }
-}, 0);

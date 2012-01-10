@@ -20,15 +20,38 @@ test('register module', function () {
   equals('mod', mod.name, 'object.name setted by module name');
 });
 
-test('inject library dependency automately', function () {
+test('inject library dependency to module automately', function () {
   J.library('lib', {});
 
   var mod = {
     $lib: null
   };
   J.module('mod', mod);
+  
+  J.init(); // must initialize to inject dependency
 
   equals(J._libraries['lib'], mod.$lib);
+});
+
+test('inject dependency between libraries', function () {
+  J.library('libA', {
+    $libB: null
+  });
+  
+  J.library('libB', {
+    $libA: null
+  });
+  
+  J.init();
+  
+  equals(J._libraries['libA'], J._libraries['libB'].$libA);
+  equals(J._libraries['libB'], J._libraries['libA'].$libB);
+});
+
+test('add core library', function () {
+  J.init();
+  
+  equals(J, J._libraries['core']);
 });
 
 test('start/stop modules', function () {

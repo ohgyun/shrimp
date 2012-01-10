@@ -1,4 +1,7 @@
-J.module('advice', {
+/**
+ * Advice Library
+ */
+J.library('advice', {
   
   /**
    * @type {Object.<string, function>}

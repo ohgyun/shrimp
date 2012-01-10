@@ -4,6 +4,8 @@
 J.library('ps', {
 
   $core: null,
+  
+  $util: null,
 
   /**
    * Subscribers map.
@@ -34,11 +36,11 @@ J.library('ps', {
    * @return {string} Subscribed callback id
    */
   subscribe: function (topic, callback) {
-    var callbackId = this.$core.guid();
+    var callbackId = this.$util.guid();
     
-    this.eachSubscriberMapDepth(topic, function (n, m, map, isLast) {
+    this.eachSubscriberMapDepth(topic, function (messageName, currentMap, parentMap, isLast) {
       if (isLast) {
-        m[callbackId] = callback; 
+        currentMap[callbackId] = callback; 
       }
     });
 
@@ -49,25 +51,21 @@ J.library('ps', {
    * Do callback for each subscribers map depth
    *
    * @param {string} topic
-   * @param {function(string, Object, Object, boolean)} callback(n, m, map, isLast)
-   *           n (string) depth name
-   *           m (object) current map
-   *           map (object) parent map
-   *           isLast (boolean) is last depth
+   * @param {function(string, Object, Object, boolean)} callback(messageName, currentMap, parentMap, isLast)
    */
   eachSubscriberMapDepth: function (topic, callback) {
-    var map = this._subscribersMap,
+    var parentMap = this._subscribersMap,
       topics = topic.split('.'),
       len = topics.length,
-      n, m;
+      messageName, currentMap;
     
     for (var i = 0; i < len; i++) {
-      n = topics[i];
-      m = map[n] = (map[n] || {});
+      messageName = topics[i];
+      currentMap = parentMap[messageName] = (parentMap[messageName] || {});
             
-      callback(n, m, map, i + 1 === len); 
+      callback(messageName, currentMap, parentMap, i + 1 === len); 
       
-      map = m;
+      parentMap = currentMap;
     }
   },
 
@@ -77,9 +75,9 @@ J.library('ps', {
    * @param {string} callbackId
    */
   unsubscribe: function (topic, callbackId) {
-    this.eachSubscriberMapDepth(topic, function (n, m, map, isLast) {
+    this.eachSubscriberMapDepth(topic, function (messageName, currentMap, parentMap, isLast) {
       if (isLast) {
-        delete m[callbackId]; 
+        delete currentMap[callbackId]; 
       }
     });
   },
@@ -91,19 +89,19 @@ J.library('ps', {
    */
   publish: function (topic, data) {
     var t = this,
-      runCallback = function (m) {
-        t.$core.eachProperty(m, function (k, v) {
-          if (typeof v === 'function') {
-            v(data, topic);
+      runCallback = function (currentMap) {
+        t.$core.eachProperty(currentMap, function (callbackId, callback) {
+          if (typeof callback === 'function') {
+            callback(data, topic);
           }
         });
       };
     
-    this.eachSubscriberMapDepth(topic, function (n, m, map, isLast) {
-      runCallback(map['*']);
+    this.eachSubscriberMapDepth(topic, function (messageName, currentMap, parentMap, isLast) {
+      runCallback(parentMap['*']);
       
       if (isLast) {
-        runCallback(m);
+        runCallback(currentMap);
       }
     });
   },  
@@ -113,9 +111,9 @@ J.library('ps', {
    * @param {string} topic
    */
   clear: function (topic) {
-    this.eachSubscriberMapDepth(topic, function (n, m, map, isLast) {
+    this.eachSubscriberMapDepth(topic, function (messageName, currentMap, parentMap, isLast) {
       if (isLast) {
-        delete map[n];  
+        delete map[messageName];  
       }
     });
   }

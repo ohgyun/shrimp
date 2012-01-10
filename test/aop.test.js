@@ -1,6 +1,6 @@
 module('J.aop', {
-  setup: function () {  
-    window.o = J.get('aop');
+  setup: function () {
+    aop().$core = J;
     
     // set mock
     createMockPointcut();
@@ -10,13 +10,15 @@ module('J.aop', {
     J.module('mockA', {});
     J.module('mockB', {});
     J.module('mockC', {});
-    
-    J.init();
   },
   teardown: function () {
-    J.destroy('mockA', 'mockB', 'mockC');
+    J._modules = {};
   }
 });
+
+function aop() {
+  return J._libraries['aop']; 
+}
 
 function createMockPointcut() {
   var mockPointcut = mock({
@@ -27,7 +29,7 @@ function createMockPointcut() {
   // if module name starts with 'mock' then return true;
   when(mockPointcut.match)(anything(), containsString('mock'), anything()).thenReturn(true);
   
-  J.module('pointcut', mockPointcut);
+  aop().$pointcut = mockPointcut;
 }
 
 function createMockAdvice() {
@@ -36,7 +38,7 @@ function createMockAdvice() {
     set: mockFunction()
   });
   
-  J.module('advice', mockAdvice);
+  aop().$advice = mockAdvice;
 }
 
 test('add advisor with pointcut and advice', function () {
@@ -44,19 +46,19 @@ test('add advisor with pointcut and advice', function () {
   var pointcut = 'testPointcut';
   var advice = function (method) {};
   
-  o.addAdvisor(id, pointcut, advice);
+  aop().addAdvisor(id, pointcut, advice);
   
-  verify(J.get('pointcut').add, times(1))(id, pointcut);
-  verify(J.get('advice').add, times(1))(id, advice);
+  verify(aop().$pointcut.add, times(1))(id, pointcut);
+  verify(aop().$advice.add, times(1))(id, advice);
 });
 
 test('apply advisor to modules', function () {
   var id = 'testId';
   
-  o.applyAdvisorToModules(id);
+  aop().applyAdvisorToModules(id);
   
-  verify(J.get('advice').set, times(3))(id, anything(), anything()); 
-  
+  verify(aop().$advice.set, times(3))(id, anything(), anything()); 
+  // because mock pointcut.match returns true if module name starts with 'mock'
 });
 
 

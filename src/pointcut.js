@@ -1,4 +1,7 @@
-J.module('pointcut', {
+/**
+ * Pointcut Library
+ */
+J.library('pointcut', {
   
   /**
    * pointcut expressions
