@@ -7,46 +7,51 @@
  * @author ohgyun@gmail.com
  * @version 0.1
  */
-if (!window.J) window.J = {
+if ( ! window.J) window.J = {
 
   /**
+   * Libraries. Modules can access a library by 'this.$libraryName' variable.
+   * @type {Object.<string, Object>}
+   */
+  _libraries: {},
+
+  /**
+   * Modules
    * @type {Object.<string, Object>}
    */
   _modules: {},
+
+  /**
+   * Register library
+   * @param {string} name Library name
+   * @param {!Object} obj Library object
+   */
+  library: function (name, obj) {
+    this._libraries[name] = obj;
+  },
  
   /**
-   * define module
+   * Register module.
    * @param {string} name Module name. 'name' property of obj is setted by this name.
    * @param {!Object} obj Module object.
    */
   module: function (name, obj) {
     obj.name = name;
+    this.injectLibraryDependency(obj);
     this._modules[name] = obj;
   },
 
   /**
-   * init framework.
-   * inject module dependency and init each module.
+   * Inject library dependency to member variables of module that start with '$'.
+   * e.g. if module has $some variable, library 'some' is assigned to $some.
    */
-  init: function () {
-    this.module('core', this);
-    this.injectDependency();
-    this.initModules();
-  },
-
-  /**
-   * Inject module dependency to variables that start with '$'.
-   * e.g. if object has $some variable, module 'some' is assigned to $some.
-   */
-  injectDependency: function () {
+  injectLibraryDependency: function (obj) {
     var t = this;
-    t.eachModule(function (name, obj) {
-      t.eachProperty(obj, function (k, v) {
-        if (k.substring(0, 1) === '$') {
-          var refName = k.substring(1);
-          this[k] = t.get(refName);
-        }
-      });
+    t.eachProperty(obj, function (k, v) {
+      if (k.substring(0, 1) === '$') {
+        var libName = k.substring(1);
+        this[k] = t._libraries[libName];
+      }
     });
   },
 
@@ -62,7 +67,7 @@ if (!window.J) window.J = {
   /**
    * Do callback for each property
    * @param {!Object} obj
-   * @param {function(string, *)} callback
+   * @param {function(this:obj, string, *)} callback
    */
   eachProperty: function (obj, callback) {
     var k, v;
@@ -88,40 +93,48 @@ if (!window.J) window.J = {
   },  
 
   /**
-   * get module by name
-   * @param {string} name Module name.
-   * @return {Object} module
+   * Start all modules.
    */
-  get: function (name) {
-    return this._modules[name];
-  },
-
-  /**
-   * init method of each module is called
-   */
-  initModules: function () {
+  startAll: function () {
     this.eachModule(function (name, obj) {
-      if (typeof obj.init === 'function' && name !== 'core') {
+      if (typeof obj.init === 'function') {
         obj.init();
       }
     });
   },
 
   /**
-   * destroy module
-   * @param {...string} var_args Module names to destroy.
+   * Start module
+   * @param {string} moduleName
    */
-  destroy: function (var_args) {
-    var args = Array.prototype.slice.call(arguments),
-      modules = this._modules;
-      
-    this.each(args, function (i, v) {
-      var module = modules[v];
-      if (module && typeof module.destroy === 'function') {
-        module.destroy(); 
+  start: function (moduleName) {
+    var module = this._modules[moduleName];
+    if (typeof module.init === 'function') {
+      module.init();
+    }
+  },
+
+  /**
+   * Stop all modules
+   */
+  stopAll: function () {
+    this.eachModule(function (name, obj) {
+      if (typeof obj.destroy === 'function') {
+        obj.destroy();
       }
-      delete modules[v];
     });
+  },
+
+  /**
+   * Stop module
+   * @param {string} moduleName
+   */
+  stop: function (moduleName) {
+    var module = this._modules[moduleName];
+    if (typeof module.destroy === 'function') {
+      module.destroy();
+    }
+
   },
   
   /**

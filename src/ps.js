@@ -1,7 +1,7 @@
 /**
- * Pub/Sub Module
+ * Pub/Sub Library
  */
-J.module('ps', {
+J.library('ps', {
 
   $core: null,
 

@@ -37,10 +37,10 @@ module('J.ps', {
       }
     });
    
-    J.init();
+    J.startAll();
   },
   teardown: function () {
-    J.destroy('p', 's1', 's2');
+    J._modules = {};
   }
 
 });
