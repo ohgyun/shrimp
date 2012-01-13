@@ -13,24 +13,40 @@ test('register library', function () {
   equals(lib, J._libraries.lib);
 });
 
-test('register module', function () {
-  var mod = {};
-  J.module('mod', mod);
-  equals(mod, J._modules.mod);
-  equals('mod', mod.name, 'object.name setted by module name');
+test('define namespace', function () {
+  J.namespace('foo');
+  same({
+    name: 'foo'
+  }, J._modules['foo']);
 });
 
-test('inject library dependency to module automately', function () {
+test('register module', function () {
+  var one = {};
+  J.module('foo.one', one);
+  
+  equals(one, J._modules.foo.one);
+  equals('one', one.name);
+  equals('foo.one', one.fullName);
+});
+
+test('register module without namespace', function () {
+  raises(function () {
+    // module should be like 'namespace.moduleName'.
+    J.module('some', {});  
+  });
+});
+
+test('inject library dependency to module automatically', function () {
   J.library('lib', {});
 
-  var mod = {
+  var bar = {
     $lib: null
   };
-  J.module('mod', mod);
+  J.module('foo.bar', bar);
   
   J.init(); // must initialize to inject dependency
 
-  equals(J._libraries['lib'], mod.$lib);
+  equals(J._libraries['lib'], bar.$lib);
 });
 
 test('inject dependency between libraries', function () {
@@ -54,32 +70,52 @@ test('add core library', function () {
   equals(J, J._libraries['core']);
 });
 
+test('inject dependency between modules', function () {
+  J.module('foo.one', {
+    __two: null
+  });
+  
+  J.module('foo.two', {
+    __one: null
+  });
+  
+  J.module('bar.one', {
+    __two: null
+  });
+  
+  J.init();
+  
+  equals(J._modules['foo']['one'], J._modules['foo']['two'].__one);
+  equals(J._modules['foo']['two'], J._modules['foo']['one'].__two);
+  equals(null, J._modules['bar']['one'].__two);
+});
+
 test('start/stop modules', function () {
-  createMockModule('a');
+  createMockModule('foo.one');
 
-  J.start('a');
+  J.start('foo.one');
+  
+  verify(J._modules['foo']['one'].init, times(1))();
+  verify(J._modules['foo']['one'].destroy, times(0))();
 
-  verify(J._modules['a'].init, times(1))();
-  verify(J._modules['a'].destroy, times(0))();
+  J.stop('foo.one');
 
-  J.stop('a');
-
-  verify(J._modules['a'].destroy, times(1))();
+  verify(J._modules['foo']['one'].destroy, times(1))();
 });
 
 test('start/stop all modules', function () {
-  createMockModule('a');
-  createMockModule('b');
+  createMockModule('foo.one');
+  createMockModule('foo.two');
 
   J.startAll();
 
-  verify(J._modules['a'].init, times(1))();
-  verify(J._modules['b'].init, times(1))();
+  verify(J._modules['foo']['one'].init, times(1))();
+  verify(J._modules['foo']['two'].init, times(1))();
 
   J.stopAll();
 
-  verify(J._modules['a'].destroy, times(1))();
-  verify(J._modules['b'].destroy, times(1))();
+  verify(J._modules['foo']['one'].destroy, times(1))();
+  verify(J._modules['foo']['two'].destroy, times(1))();
 });
 
 function createMockModule(name) {
