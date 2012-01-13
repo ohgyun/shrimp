@@ -7,9 +7,9 @@ module('J.aop', {
     createMockAdvice();
        
     // set test object
-    J.module('mockA', {});
-    J.module('mockB', {});
-    J.module('mockC', {});
+    J.module('mock.mockA', {});
+    J.module('mock.mockB', {});
+    J.module('mock.mockC', {});
   },
   teardown: function () {
     J._modules = {};
@@ -55,6 +55,7 @@ test('add advisor with pointcut and advice', function () {
 test('apply advisor to modules', function () {
   var id = 'testId';
   
+  // TODO modify pointcut
   aop().applyAdvisorToModules(id);
   
   verify(aop().$advice.set, times(3))(id, anything(), anything()); 

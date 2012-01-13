@@ -4,9 +4,9 @@
 <head>
 <link rel="stylesheet" href="http://code.jquery.com/qunit/git/qunit.css" type="text/css" media="screen" />
 <style type="text/css">
-#moduleWrap {margin:5px 0; padding:4px; border:2px solid #333; font-family:"Helvetica"}
-#moduleWrap h2 {margin:2px 0; font-size:1.2em}
-#modules a {padding:2px 6px}
+#libWrap {margin:5px 0; padding:4px; border:2px solid #333; font-family:"Helvetica"}
+#libWrap h2 {margin:2px 0; font-size:1.2em}
+#libs a {padding:2px 6px}
 </style>
 <script type="text/javascript" src="http://code.jquery.com/qunit/git/qunit.js"></script>
 <script type="text/javascript" src="http://jshamcrest.destaquenet.com/jshamcrest.js"></script>
@@ -14,9 +14,9 @@
 <script type="text/javascript" src="../src/core.js"></script>
 </head>
 <body>  
-<div id="moduleWrap">
-  <h2>Modules</h2>  
-  <div id="modules"></div>
+<div id="libWrap">
+  <h2>Libraries</h2>  
+  <div id="libs"></div>
 </div>
 <div id="qunitWrap" style="display:none;">
   <h1 id="qunit-header">QUnit example</h1>
@@ -35,25 +35,26 @@ JsMockito.Integration.QUnit();
   
 (function () {
   
-  var modules = ['core', 'util', 'ps', 'pointcut', 'advice', 'aop'],
+  var libs = ['core', 'util', 'ps', 'pointcut', 'advice', 'aop'],
     search = location.search,
-    siModuleName = search.indexOf('module=') + 7,
-    eiModuleName = search.indexOf('&') > -1 ? search.indexOf('&') : search.length,
-    moduleName = search.slice(siModuleName, eiModuleName),
-    moduleJsUrl = '../src/' + moduleName + '.js',
-    moduleTestUrl = moduleName + '.test.js';
-
-  // print modules button
+    siLibName = search.indexOf('lib=') + 4,
+    eiLibName = search.indexOf('&') > -1 ? search.indexOf('&') : search.length,
+    libName = search.slice(siLibName, eiLibName),
+    libPath = libName === 'core' ? '' : 'lib/',
+    libJsUrl = '../src/' + libPath + libName + '.js',
+    libTestUrl = libPath + libName + '.test.js';
+  
+  // print libs button
   var a = [];
-  for (var i = 0; i < modules.length; i++) {
-    a.push('<a href="./index.html?module=' + modules[i] + '">' + modules[i] + '</a>');
+  for (var i = 0; i < libs.length; i++) {
+    a.push('<a href="./index.html?lib=' + libs[i] + '">' + libs[i] + '</a>');
   }
-  document.getElementById('modules').innerHTML = a.join('');
+  document.getElementById('libs').innerHTML = a.join('');
 
   // print test script
-  if (moduleName && moduleTestUrl) {
-    document.write('<script src="' + moduleJsUrl + '"><' + '/script>');
-    document.write('<script src="' + moduleTestUrl + '"><' + '/script>');
+  if (libName && libTestUrl) {
+    document.write('<script src="' + libJsUrl + '"><' + '/script>');
+    document.write('<script src="' + libTestUrl + '"><' + '/script>');
     document.getElementById('qunitWrap').style.display = "block";
   }
   
