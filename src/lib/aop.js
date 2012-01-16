@@ -38,12 +38,16 @@ J.library('aop', {
    */
   applyAdvisorToModules: function (id) {
     var t = this;
-    this.$core.eachModule(function (name, obj) {
-      t.$core.eachProperty(obj, function (k, v) {
-        if (t.$pointcut.match(id, name, k)) {
-          t.$advice.set(id, obj, k);
-        }
+    this.$core.eachModule(function (moduleName, module) {
+      
+      // each property
+      t.$core.eachProperty(module, function (k, v) {
+        t.$advice.set(id, module, k);
+      }, function (k, v) {
+        return typeof v === 'function' && t.$pointcut.match(id, moduleName, k); 
       });
+      // each property
+      
     });
   }
 });

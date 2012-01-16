@@ -1,8 +1,8 @@
 /**
- * j-framework
+ * Jeff
  * 
- * j-framework is a simple javascript framework.
- * The important point of this framework is clarifying dependencies between modules.
+ * Jeff is a javascript framework designed to be easliy managing dependencies between libraries and each module.
+ * More information: https://github.com/ohgyun/jeff/wiki/jeff
  *
  * @author ohgyun@gmail.com
  * @version 0.1
@@ -30,14 +30,14 @@ if ( ! window.J) window.J = {
   _modules: {},
 
   /**
-   * Prefix of library reference
+   * Library variable pattern.
    */
-  PREFIX_LIBRARY: '$',
+  _rLibraryVar: /^\$[\w_]+$/,
   
   /**
-   * Prefix of module reference
+   * Module variable pattern.
    */
-  PREFIX_MODULE: '__',
+  _rModuleVar: /^__[\w_]+$/,
   
   /**
    * Module name pattern. 'namespaceName.moduleName' is allowed.
@@ -153,14 +153,24 @@ if ( ! window.J) window.J = {
   injectDependencyModuleToModule: function () {
     var t = this;
     t.eachNamespace(function (namespaceName, namespace) {
+      
+      // each namespace
       t.eachProperty(namespace, function (moduleName, module) {
+        
+        // each module
         t.eachProperty(module, function (k, v) {
-          if (k.substring(0, 2) === t.PREFIX_MODULE) {
-            var moduleName = k.substring(2);
-            this[k] = t._modules[namespaceName][moduleName];
-          }
+          var moduleName = k.substring(2);
+          this[k] = t._modules[namespaceName][moduleName];
+        }, function (k, v) {
+          return t._rModuleVar.test(k);
         });
+        // end each module
+      
+      }, function (moduleName, module) {
+        return moduleName !== 'name'; 
       });
+      // end each namespace
+      
     });
   },
 
@@ -172,10 +182,10 @@ if ( ! window.J) window.J = {
   injectLibraryDependency: function (target) {
     var t = this;
     t.eachProperty(target, function (k, v) {
-      if (k.substring(0, 1) === t.PREFIX_LIBRARY) {
-        var libName = k.substring(1);
-        this[k] = t._libraries[libName];
-      }
+      var libName = k.substring(1);
+      this[k] = t._libraries[libName];
+    }, function (k, v) {
+      return t._rLibraryVar.test(k);
     });
   },
 
@@ -193,8 +203,8 @@ if ( ! window.J) window.J = {
    * @param {function(string namespaceName, !Object namespace)} callback
    */
   eachNamespace: function (callback) {
-    var namespaces = this._modules;
-    this.eachProperty(namespaces, callback);
+    var namespaceWrapper = this._modules;
+    this.eachProperty(namespaceWrapper, callback);
   },
 
   /**
@@ -203,8 +213,10 @@ if ( ! window.J) window.J = {
    */
   eachModule: function (callback) {
     var t = this;
-    this.eachNamespace(function (name, obj) {
-      t.eachProperty(obj, callback);
+    this.eachNamespace(function (namespaceName, namespace) {
+      t.eachProperty(namespace, callback, function (moduleName, module) {
+        return moduleName !== 'name' && typeof module === 'object';
+      });
     });
   },
 
@@ -212,11 +224,16 @@ if ( ! window.J) window.J = {
    * Do callback for each property
    * @param {!Object} obj
    * @param {function(this:obj, string k, * v)} callback
+   * @param {function(string k, * v): boolean} opt_filter 
    */
-  eachProperty: function (obj, callback) {
+  eachProperty: function (obj, callback, opt_filter) {
     var k, v;
+    opt_filter = opt_filter || function () {
+      return true;
+    };
+    
     for (k in obj) {
-      if (obj.hasOwnProperty(k)) {
+      if (obj.hasOwnProperty(k) && opt_filter(k, obj[k])) {
         v = obj[k];
         callback.call(obj, k, v);
       }
@@ -228,9 +245,9 @@ if ( ! window.J) window.J = {
    * @public
    */
   startAll: function () {
-    this.eachModule(function (name, obj) {
-      if (typeof obj.init === 'function') {
-        obj.init();
+    this.eachModule(function (moduleName, module) {
+      if (typeof module.init === 'function') {
+        module.init();
       }
     });
   },
@@ -254,9 +271,9 @@ if ( ! window.J) window.J = {
    * @public
    */
   stopAll: function () {
-    this.eachModule(function (name, obj) {
-      if (typeof obj.destroy === 'function') {
-        obj.destroy();
+    this.eachModule(function (moduleName, module) {
+      if (typeof module.destroy === 'function') {
+        module.destroy();
       }
     });
   },
