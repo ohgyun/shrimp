@@ -1,15 +1,27 @@
 /**
  * Implementation example of search box
  */
-J.model('example.searchbox', {
-  
+J.model({
+  package: 'example',
+  id: 'searchbox'
+}, {
   
 });
 
 
-J.view('example.searchbox', {
+J.view({
+  package: 'example',
+  id: 'searchbox'
+}, {
   
-  el: '',
+  el: '#searchbox',
+  
+  events: {
+    'focus .query': 'onFocusQuery',
+    'blur .query': 'onBlurQuery',
+    'keydown .query': 'onKeydownQuery',
+    'click .submit': 'onClickSubmit' 
+  },
   
   
   

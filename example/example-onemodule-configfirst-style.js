@@ -1,22 +1,22 @@
-/**
+﻿/**
  * Implementation example of search box
+ * With config parameter
+ * File name: example.searchbox.js
  */
-J.module('example.searchbox', {
-  
-  $ps: null,
-  
-  $dom: null,
-  
-  $event: null,
-  
-  _nodes: null,
-  
+J.module({
+  package: 'example',
+  id: 'searchbox',
+  singleton: false, // is singleton? default: true
+  autostart: true, // start automatically when framework initialized. default: false
+  libraries: ['ps', 'dom', 'event'], //--> this.$ps, this.$dom, this.$event
+  modules: ['a1', 'a2'] //--> this.__a1, this.__a2 in same package
+}, {
   init: function () {
     this.$dom.node('#searchbox', {
       query: '.query',
       submitBtn: '.submit'
     }, this);
-    
+     
     this.$event.bind([
       {node: 'query', type: 'focus'},
       {node: 'query', type: 'blur'},
@@ -47,4 +47,5 @@ J.module('example.searchbox', {
       query: value
     });
   }
+
 });
