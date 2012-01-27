@@ -1,3 +1,5 @@
+(Work in progress)
+
 Jeff
 ====
 A javascript framework designed to be easily managing dependencies between libraries and each module.
