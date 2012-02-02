@@ -1,7 +1,7 @@
 /**
  * Pointcut Library
  */
-J.library('pointcut', {
+Shrimp.library('pointcut', {
   
   /**
    * pointcut expressions
@@ -16,8 +16,8 @@ J.library('pointcut', {
   _rExpr: /^(?:([\w\*]+)\.)?([\w\*]+)\(\)$/,
   
   MSG: {
-    INVALID_EXPR: 'J.pointcut: invalid expression',
-    ID_REQUIRED: 'J.pointcut: id required'
+    INVALID_EXPR: 'Shrimp.pointcut: invalid expression',
+    ID_REQUIRED: 'Shrimp.pointcut: id required'
   },
   
   /**

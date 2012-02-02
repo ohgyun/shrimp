@@ -1,7 +1,7 @@
 /**
  * Pub/Sub Library
  */
-J.library('ps', {
+Shrimp.library('ps', {
 
   $core: null,
   

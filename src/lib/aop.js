@@ -1,7 +1,7 @@
 /**
  * AOP Library
  */
-J.library('aop', {
+Shrimp.library('aop', {
   
   $core: null,
   

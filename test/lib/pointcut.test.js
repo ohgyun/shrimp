@@ -1,7 +1,7 @@
-module('J.pointcut', {});
+module('Shrimp.pointcut', {});
 
 function pc() {
-  return J._libraries['pointcut']; 
+  return Shrimp._libraries['pointcut']; 
 }
 
 function matchName(expression, name) {

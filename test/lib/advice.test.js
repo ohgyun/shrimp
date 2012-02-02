@@ -1,7 +1,7 @@
-module('J.advice');
+module('Shrimp.advice');
 
 function adv() {
-  return J._libraries['advice']; 
+  return Shrimp._libraries['advice']; 
 }
 
 test('add advice', function () {

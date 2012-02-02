@@ -1,6 +1,6 @@
-module('J.ps', {
+module('Shrimp.ps', {
   setup: function () {
-    ps().$core = J;
+    ps().$core = Shrimp;
   
     // Set mock util libarary
     MOCK_CALLBACK_ID = 'mock-callback-id';
@@ -12,7 +12,7 @@ module('J.ps', {
   
   },
   teardown: function () {
-    J._modules = {};
+    Shrimp._modules = {};
     ps()._subscribersMap = {};
   }
 
@@ -23,7 +23,7 @@ module('J.ps', {
  * @return {Object} ps library
  */
 function ps() {
-  return J._libraries['ps'];
+  return Shrimp._libraries['ps'];
 }
 
 /**

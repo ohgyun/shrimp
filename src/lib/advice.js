@@ -1,7 +1,7 @@
 /**
  * Advice Library
  */
-J.library('advice', {
+Shrimp.library('advice', {
   
   /**
    * @type {Object.<string, function>}
@@ -9,7 +9,7 @@ J.library('advice', {
   _advices: {},
   
   msg: {
-    ADVICE_SHOULD_BE_FUNCTION: 'J.advice: advice should be function'
+    ADVICE_SHOULD_BE_FUNCTION: 'Shrimp.advice: advice should be function'
   },
   
   /**

@@ -1,7 +1,7 @@
 /**
  * Util Library
  */
-J.library('util', {
+Shrimp.library('util', {
   /**
    * Create random unique id
    * @return {string} Random id.

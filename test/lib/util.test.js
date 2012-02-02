@@ -1,7 +1,7 @@
-module('J.util', {});
+module('Shrimp.util', {});
 
 function util() {
-  return J._libraries['util']; 
+  return Shrimp._libraries['util']; 
 }
 
 test('guid', function () {

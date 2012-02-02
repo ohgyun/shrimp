@@ -1,13 +1,13 @@
 /**
- * Jeff
+ * Shrimp.js
  * 
- * Jeff is a javascript framework designed to be easliy managing dependencies between libraries and each module.
- * More information: https://github.com/ohgyun/jeff/wiki/jeff
+ * Shrimp is a javascript framework designed to be easliy managing dependencies between libraries and each module.
+ * More information: https://github.com/ohgyun/shrimp/wiki/shrimp
  *
  * @author ohgyun@gmail.com
  * @version 0.1
  */
-if ( ! window.J) window.J = {
+if ( ! window.Shrimp) window.Shrimp = {
 
   /**
    * Libraries. Modules can access a library by 'this.$libraryName' variable.
@@ -32,12 +32,12 @@ if ( ! window.J) window.J = {
   /**
    * Library variable pattern.
    */
-  _rLibraryVar: /^\$[\w_]+$/,
+  _rLibraryVar: /^\$\w+$/,
   
   /**
    * Module variable pattern.
    */
-  _rModuleVar: /^__[\w_]+$/,
+  _rModuleVar: /^__\w+$/,
   
   /**
    * Module name pattern. 'namespaceName.moduleName' is allowed.

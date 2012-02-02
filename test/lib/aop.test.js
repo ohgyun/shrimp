@@ -1,29 +1,29 @@
-module('J.aop', {
+module('Shrimp.aop', {
   setup: function () {
-    aop().$core = J;
+    aop().$core = Shrimp;
     
     // set mock
     createMockPointcut();
     createMockAdvice();
        
     // set test object
-    J.module('mock.mockA', {
+    Shrimp.module('mock.mockA', {
       doSomething: mockFunction()
     });
-    J.module('mock.mockB', {
+    Shrimp.module('mock.mockB', {
       doSomething: mockFunction()
     });
-    J.module('mock.mockC', {
+    Shrimp.module('mock.mockC', {
       doSomething: mockFunction()
     });
   },
   teardown: function () {
-    J._modules = {};
+    Shrimp._modules = {};
   }
 });
 
 function aop() {
-  return J._libraries['aop']; 
+  return Shrimp._libraries['aop']; 
 }
 
 function createMockPointcut() {
