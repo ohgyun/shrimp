@@ -6,8 +6,7 @@
 J.module({
   package: 'productlist',
   id: 'item',
-  plugins: ['model'],
-  singleton: false,
+  plugins: ['model', 'class'],
   autostart: false,
   libraries: [],
   modules: []
@@ -39,7 +38,6 @@ J.module({
 J.module({
   package: 'productlist',
   id: 'list',
-  singleton: true,
   plugins: ['models']
   libraries: [],
   modules: []
@@ -63,7 +61,15 @@ J.module({
   plugin_options: {
     view: {
       templateId: 'j-productlist-list-tmpl',
-      modelId: 'list'
+      modelId: 'list',
+      parentId: 'list-wrapper',
+      nodes: {
+        submitBtn: '.submit', //-> this._welSubmit
+        cancelBtn: '.cancel' //-> this._welCancel
+      },
+      events: [
+      
+      ]      
     }
   }
 
